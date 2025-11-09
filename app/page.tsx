@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Search, MapPin, Phone, Globe, X, Sun, Moon, Menu, ClipboardList } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import { fetchPharmaciesByCity } from '@/lib/pharmacyApi';
 
 const PharmacyMap = dynamic(() => import('@/components/PharmacyMap'), {
   ssr: false,
@@ -290,12 +291,21 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      const filtered = MOCK_PHARMACIES.filter(p => p.cityCode === selectedCity);
-      setPharmacies(filtered);
-      setLoading(false);
-    }, 300);
+    const loadPharmacies = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchPharmaciesByCity(selectedCity);
+        setPharmacies(data);
+      } catch (error) {
+        console.error('Failed to fetch pharmacies from API, using fallback data:', error);
+        const filtered = MOCK_PHARMACIES.filter(p => p.cityCode === selectedCity);
+        setPharmacies(filtered);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPharmacies();
   }, [selectedCity]);
 
   const filteredPharmacies = useMemo(() => {
