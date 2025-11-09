@@ -20,7 +20,7 @@ This application integrates with an external API to fetch pharmacy data for diab
 
    - Go to **Settings** → **Environment Variables**
    - Add a new environment variable:
-     - **Name:** `NEXT_PUBLIC_API_KEY`
+     - **Name:** `DIABETES_SCREENING_API_KEY`
      - **Value:** Your actual API key
      - **Environment:** Production, Preview, Development (select all)
    - Click **Save**
@@ -31,16 +31,21 @@ This application integrates with an external API to fetch pharmacy data for diab
    For local testing, you can create a `.env.local` file:
 
    ```
-   NEXT_PUBLIC_API_KEY=your_actual_api_key_here
+   DIABETES_SCREENING_API_KEY=your_actual_api_key_here
    ```
 
    ⚠️ **Important:** Never commit `.env.local` to version control. It's already in `.gitignore`.
 
-3. **Environment Variables**
+3. **Architecture**
 
-   The application uses the `NEXT_PUBLIC_API_KEY` environment variable. The `NEXT_PUBLIC_` prefix is required because this is a static export application that runs entirely in the browser. The API key will be included in the client-side bundle.
+   The application uses a secure server-side API route (`/app/api/pharmacies/route.ts`) to proxy requests to the external API. This keeps your API key secure on the server and prevents it from being exposed in the client-side bundle.
 
-   > **Security Note:** For production applications handling sensitive data, consider implementing a backend proxy to keep API keys secure.
+   **Request Flow:**
+   ```
+   Browser → Next.js API Route (/api/pharmacies) → External API
+   ```
+
+   The `DIABETES_SCREENING_API_KEY` environment variable is only accessible on the server side, ensuring it never gets exposed to the browser.
 
 ### API Request Format
 
@@ -97,14 +102,20 @@ The API should return an array of pharmacy objects with the following structure:
 
 ### Implementation Details
 
-The API integration is handled in `/lib/pharmacyApi.ts`:
+The API integration uses two layers:
 
-```typescript
-import { fetchPharmaciesByCity } from '@/lib/pharmacyApi';
+1. **Client-side helper** (`/lib/pharmacyApi.ts`):
+   ```typescript
+   import { fetchPharmaciesByCity } from '@/lib/pharmacyApi';
 
-// Usage in component
-const data = await fetchPharmaciesByCity('CASABLANCA');
-```
+   // Usage in component
+   const data = await fetchPharmaciesByCity('CASABLANCA');
+   ```
+
+2. **Server-side API route** (`/app/api/pharmacies/route.ts`):
+   - Securely stores and uses the API key
+   - Proxies requests to the external API
+   - Handles authentication and error responses
 
 ### Fallback Mechanism
 
@@ -128,11 +139,11 @@ All errors are logged to the browser console for debugging purposes.
 ### Testing the Integration
 
 1. **Without API Key** (Uses fallback data):
-   - Don't set the `NEXT_PUBLIC_API_KEY` environment variable
+   - Don't set the `DIABETES_SCREENING_API_KEY` environment variable
    - The app will use mock pharmacy data
 
 2. **With API Key** (Uses live data):
-   - Set `NEXT_PUBLIC_API_KEY` in Vercel environment variables
+   - Set `DIABETES_SCREENING_API_KEY` in Vercel environment variables
    - For local testing, add it to `.env.local`
    - Restart the development server
    - The app will fetch live data from the API
@@ -143,41 +154,40 @@ All errors are logged to the browser console for debugging purposes.
 ```bash
 npm run dev
 ```
-API calls are made directly from the browser to the external API.
+API calls go through the Next.js API route at `/api/pharmacies`.
 
 **Production Build:**
 ```bash
 npm run build
 npm start
 ```
-The static export includes the API key in the bundle. All requests are client-side.
+The API route securely handles all external API requests. The API key is never exposed to the client.
 
 ### Security Considerations
 
-⚠️ **Important Security Notes:**
+✅ **Secure Implementation:**
 
-1. **Client-Side API Keys**: This implementation exposes the API key in the client-side JavaScript bundle. This is suitable for:
-   - Public APIs with rate limiting
-   - APIs with IP restrictions
-   - Development and testing environments
+This application uses a secure server-side proxy pattern:
 
-2. **Production Recommendations**:
-   - Implement a backend proxy server to hide API keys
-   - Use authentication tokens with short expiration
-   - Implement rate limiting on your backend
-   - Monitor API usage for unusual patterns
+1. **API Key Security**: The `DIABETES_SCREENING_API_KEY` is stored securely on the server and never exposed to the browser.
 
-3. **Alternative Architecture** (More Secure):
-   ```
-   Browser → Your Backend API → External API
-   ```
-   This keeps the API key secure on your server.
+2. **Server-Side Proxy**: All external API requests are routed through the Next.js API route (`/app/api/pharmacies/route.ts`), which:
+   - Keeps the API key server-side only
+   - Prevents unauthorized access to the external API
+   - Allows you to implement additional rate limiting if needed
+   - Provides a centralized place for API error handling
+
+3. **Best Practices**:
+   - Never commit API keys to version control
+   - Use environment variables for all sensitive data
+   - Monitor API usage through your provider's dashboard
 
 ### Troubleshooting
 
 **Problem: No data appearing**
-- Check if `NEXT_PUBLIC_API_KEY` is configured in Vercel environment variables
+- Check if `DIABETES_SCREENING_API_KEY` is configured in Vercel environment variables
 - Check browser console for error messages
+- Check server logs in Vercel for API route errors
 - Verify network connectivity to the API endpoint
 - For local development, ensure `.env.local` exists with the API key
 
