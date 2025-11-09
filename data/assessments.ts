@@ -3,9 +3,9 @@ import { Assessment } from '@/types/assessment';
 export const assessments: Assessment[] = [
   {
     id: 'vao',
-    nameEn: 'VAO Test',
-    nameFr: 'Test VAO',
-    nameAr: 'اختبار VAO',
+    nameEn: 'VAO',
+    nameFr: 'VAO',
+    nameAr: 'VAO',
     descriptionEn: 'Type 2 Diabetes Risk Assessment',
     descriptionFr: 'Évaluation du risque de diabète de type 2',
     descriptionAr: 'تقييم خطر الإصابة بداء السكري من النوع الثاني',

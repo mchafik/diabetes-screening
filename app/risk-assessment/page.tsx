@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ClipboardList } from 'lucide-react';
 import { assessments } from '@/data/assessments';
 import { Assessment } from '@/types/assessment';
@@ -9,9 +9,16 @@ import { useRouter } from 'next/navigation';
 
 export default function RiskAssessmentPage() {
   const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const [language, setLanguage] = useState<'en' | 'fr' | 'ar'>('en');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [language, setLanguage] = useState<'en' | 'fr' | 'ar'>('fr');
   const router = useRouter();
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      setIsDarkMode(true);
+    }
+  }, []);
 
   const isRTL = language === 'ar';
 
@@ -23,6 +30,7 @@ export default function RiskAssessmentPage() {
       selectTest: 'Select Test',
       anonymous: 'Anonymous & Confidential',
       noDataStored: 'No personal data stored',
+      experimental: 'Experimental Feature - In Progress',
     },
     fr: {
       title: 'Évaluation des risques',
@@ -31,6 +39,7 @@ export default function RiskAssessmentPage() {
       selectTest: 'Sélectionner le test',
       anonymous: 'Anonyme et confidentiel',
       noDataStored: 'Aucune donnée personnelle stockée',
+      experimental: 'Fonctionnalité expérimentale - En cours de développement',
     },
     ar: {
       title: 'تقييم المخاطر',
@@ -39,6 +48,7 @@ export default function RiskAssessmentPage() {
       selectTest: 'اختر الاختبار',
       anonymous: 'مجهول وسري',
       noDataStored: 'لا يتم تخزين بيانات شخصية',
+      experimental: 'ميزة تجريبية - قيد التطوير',
     },
   };
 
@@ -115,6 +125,12 @@ export default function RiskAssessmentPage() {
           <p className={`text-lg ${isDarkMode ? 'text-slate-300' : 'text-gray-600'} mb-4`}>
             {t.subtitle}
           </p>
+          <div className="mb-4">
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/50`}>
+              <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-bold text-amber-500">{t.experimental}</span>
+            </div>
+          </div>
           <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${isDarkMode ? 'bg-slate-800/50' : 'bg-white'} border ${isDarkMode ? 'border-slate-700' : 'border-gray-200'}`}>
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span className="text-sm font-medium">{t.anonymous}</span>

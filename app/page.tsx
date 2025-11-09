@@ -272,7 +272,7 @@ const translations = {
 };
 
 export default function Home() {
-  const [language, setLanguage] = useState<'en' | 'fr' | 'ar'>('en');
+  const [language, setLanguage] = useState<'en' | 'fr' | 'ar'>('fr');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('CASABLANCA');
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
@@ -281,6 +281,19 @@ export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      setIsDarkMode(true);
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('theme', newMode ? 'dark' : 'light');
+  };
 
   const t = translations[language];
   const isRTL = language === 'ar';
@@ -358,7 +371,7 @@ export default function Home() {
                 <span className="font-medium">{t.riskAssessment}</span>
               </button>
               <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                onClick={toggleDarkMode}
                 className={`px-3 py-2 rounded-lg transition-all ${isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'}`}
               >
                 {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
@@ -413,7 +426,7 @@ export default function Home() {
                       <div className={`text-xs font-semibold mb-1 mt-3 ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Theme</div>
                       <button
                         onClick={() => {
-                          setIsDarkMode(!isDarkMode);
+                          toggleDarkMode();
                           setIsMenuOpen(false);
                         }}
                         className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
