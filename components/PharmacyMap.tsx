@@ -3,6 +3,9 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import 'leaflet.markercluster';
 
 interface Pharmacy {
   pharmacyNameLatin: string;
@@ -26,7 +29,7 @@ interface PharmacyMapProps {
 const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMode, language }: PharmacyMapProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const markersRef = useRef<L.Marker[]>([]);
+  const markerClusterGroupRef = useRef<L.MarkerClusterGroup | null>(null);
 
   const getPharmacyName = (pharmacy: Pharmacy) => {
     return language === 'ar' ? pharmacy.pharmacyNameArabic : pharmacy.pharmacyNameLatin;
@@ -87,10 +90,56 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
   useEffect(() => {
     if (!mapRef.current) return;
 
-    markersRef.current.forEach(marker => marker.remove());
-    markersRef.current = [];
+    if (markerClusterGroupRef.current) {
+      mapRef.current.removeLayer(markerClusterGroupRef.current);
+    }
 
     if (pharmacies.length === 0) return;
+
+    const markerClusterGroup = L.markerClusterGroup({
+      chunkedLoading: true,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      maxClusterRadius: 60,
+      iconCreateFunction: (cluster) => {
+        const count = cluster.getChildCount();
+        let size = 'small';
+        let sizeValue = 50;
+
+        if (count > 20) {
+          size = 'large';
+          sizeValue = 70;
+        } else if (count > 10) {
+          size = 'medium';
+          sizeValue = 60;
+        }
+
+        return L.divIcon({
+          html: `
+            <div style="
+              width: ${sizeValue}px;
+              height: ${sizeValue}px;
+              background: linear-gradient(135deg, #14b8a6 0%, #0891b2 100%);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              box-shadow: 0 6px 12px rgba(20, 184, 166, 0.4);
+              border: 3px solid white;
+              font-weight: 700;
+              font-size: ${count > 99 ? '14px' : '16px'};
+              color: white;
+              animation: pulse 2s ease-in-out infinite;
+            ">
+              ${count}
+            </div>
+          `,
+          className: 'custom-cluster-icon',
+          iconSize: [sizeValue, sizeValue],
+        });
+      },
+    });
 
     const customIcon = (isSelected: boolean) => L.divIcon({
       html: `
@@ -105,8 +154,9 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
           box-shadow: 0 4px 6px rgba(0,0,0,0.3);
           transform: ${isSelected ? 'scale(1.3)' : 'scale(1)'};
           transition: all 0.3s;
+          border: 3px solid white;
         ">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e293b" stroke-width="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
             <circle cx="12" cy="10" r="3"></circle>
           </svg>
@@ -121,7 +171,7 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
       const isSelected = selectedPharmacy === pharmacy;
       const marker = L.marker([pharmacy.latitude, pharmacy.longitude], {
         icon: customIcon(isSelected),
-      }).addTo(mapRef.current!);
+      });
 
       const popupContent = `
         <div style="min-width: 200px;">
@@ -141,8 +191,11 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
         marker.openPopup();
       }
 
-      markersRef.current.push(marker);
+      markerClusterGroup.addLayer(marker);
     });
+
+    mapRef.current.addLayer(markerClusterGroup);
+    markerClusterGroupRef.current = markerClusterGroup;
 
     const bounds = L.latLngBounds(pharmacies.map(p => [p.latitude, p.longitude]));
     mapRef.current.fitBounds(bounds, { padding: [50, 50] });
