@@ -30,6 +30,7 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markerClusterGroupRef = useRef<L.MarkerClusterGroup | null>(null);
+  const markersRef = useRef<Map<Pharmacy, L.Marker>>(new Map());
 
   const getPharmacyName = (pharmacy: Pharmacy) => {
     return language === 'ar' ? pharmacy.pharmacyNameArabic : pharmacy.pharmacyNameLatin;
@@ -87,12 +88,40 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
     }).addTo(map);
   }, [isDarkMode]);
 
+  const customIcon = (isSelected: boolean) => L.divIcon({
+    html: `
+      <div style="
+        width: 40px;
+        height: 40px;
+        background-color: ${isSelected ? '#a3e635' : '#14b8a6'};
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        transform: ${isSelected ? 'scale(1.3)' : 'scale(1)'};
+        transition: all 0.3s;
+        border: 3px solid white;
+      ">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+      </div>
+    `,
+    className: 'custom-marker',
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+  });
+
   useEffect(() => {
     if (!mapRef.current) return;
 
     if (markerClusterGroupRef.current) {
       mapRef.current.removeLayer(markerClusterGroupRef.current);
     }
+
+    markersRef.current.clear();
 
     if (pharmacies.length === 0) return;
 
@@ -102,6 +131,7 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
       showCoverageOnHover: false,
       zoomToBoundsOnClick: true,
       maxClusterRadius: 60,
+      disableClusteringAtZoom: 15,
       iconCreateFunction: (cluster) => {
         const count = cluster.getChildCount();
         let size = 'small';
@@ -141,36 +171,9 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
       },
     });
 
-    const customIcon = (isSelected: boolean) => L.divIcon({
-      html: `
-        <div style="
-          width: 40px;
-          height: 40px;
-          background-color: ${isSelected ? '#a3e635' : '#14b8a6'};
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-          transform: ${isSelected ? 'scale(1.3)' : 'scale(1)'};
-          transition: all 0.3s;
-          border: 3px solid white;
-        ">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
-        </div>
-      `,
-      className: 'custom-marker',
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-    });
-
     pharmacies.forEach(pharmacy => {
-      const isSelected = selectedPharmacy === pharmacy;
       const marker = L.marker([pharmacy.latitude, pharmacy.longitude], {
-        icon: customIcon(isSelected),
+        icon: customIcon(false),
       });
 
       const popupContent = `
@@ -187,10 +190,7 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
         onPharmacySelect(pharmacy);
       });
 
-      if (isSelected) {
-        marker.openPopup();
-      }
-
+      markersRef.current.set(pharmacy, marker);
       markerClusterGroup.addLayer(marker);
     });
 
@@ -200,7 +200,22 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
     const bounds = L.latLngBounds(pharmacies.map(p => [p.latitude, p.longitude]));
     mapRef.current.fitBounds(bounds, { padding: [50, 50] });
 
-  }, [pharmacies, selectedPharmacy, language]);
+  }, [pharmacies, language]);
+
+  useEffect(() => {
+    if (!mapRef.current || markersRef.current.size === 0) return;
+
+    markersRef.current.forEach((marker, pharmacy) => {
+      const isSelected = selectedPharmacy === pharmacy;
+      marker.setIcon(customIcon(isSelected));
+
+      if (isSelected) {
+        marker.openPopup();
+      } else {
+        marker.closePopup();
+      }
+    });
+  }, [selectedPharmacy]);
 
   return (
     <div
