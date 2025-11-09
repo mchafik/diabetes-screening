@@ -5,6 +5,7 @@ import { Search, MapPin, Phone, Globe, X, Sun, Moon, Menu, ClipboardList } from 
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { fetchPharmaciesByCity } from '@/lib/pharmacyApi';
+import { LIST_OF_CITIES, getCityName } from '@/data/cities';
 
 const PharmacyMap = dynamic(() => import('@/components/PharmacyMap'), {
   ssr: false,
@@ -26,208 +27,7 @@ interface Pharmacy {
   longitude: number;
 }
 
-const MOCK_PHARMACIES: Pharmacy[] = [
-  {
-    pharmacyNameLatin: "Atlas Pharmacy",
-    pharmacyNameArabic: "صيدلية أطلس",
-    cityCode: "CASABLANCA",
-    pharmacyPhone: "+212 522 123456",
-    addressLatin: "123 Boulevard Mohammed V, Casablanca",
-    addressArabic: "123 شارع محمد الخامس، الدار البيضاء",
-    latitude: 33.5898,
-    longitude: -7.6187
-  },
-  {
-    pharmacyNameLatin: "Sahara Health Pharmacy",
-    pharmacyNameArabic: "صيدلية الصحراء",
-    cityCode: "CASABLANCA",
-    pharmacyPhone: "+212 522 234567",
-    addressLatin: "45 Rue Allal Ben Abdellah, Casablanca",
-    addressArabic: "45 شارع علال بن عبد الله، الدار البيضاء",
-    latitude: 33.5731,
-    longitude: -7.5898
-  },
-  {
-    pharmacyNameLatin: "Marrakech Central Pharmacy",
-    pharmacyNameArabic: "صيدلية مراكش المركزية",
-    cityCode: "MARRAKECH",
-    pharmacyPhone: "+212 524 345678",
-    addressLatin: "78 Avenue Mohammed VI, Marrakech",
-    addressArabic: "78 شارع محمد السادس، مراكش",
-    latitude: 31.6295,
-    longitude: -7.9811
-  },
-  {
-    pharmacyNameLatin: "Jemaa El-Fna Pharmacy",
-    pharmacyNameArabic: "صيدلية جامع الفنا",
-    cityCode: "MARRAKECH",
-    pharmacyPhone: "+212 524 456789",
-    addressLatin: "12 Place Jemaa el-Fna, Marrakech",
-    addressArabic: "12 ساحة جامع الفنا، مراكش",
-    latitude: 31.6258,
-    longitude: -7.9891
-  },
-  {
-    pharmacyNameLatin: "Rabat Capital Pharmacy",
-    pharmacyNameArabic: "صيدلية الرباط العاصمة",
-    cityCode: "RABAT",
-    pharmacyPhone: "+212 537 567890",
-    addressLatin: "234 Avenue Hassan II, Rabat",
-    addressArabic: "234 شارع الحسن الثاني، الرباط",
-    latitude: 34.0209,
-    longitude: -6.8416
-  },
-  {
-    pharmacyNameLatin: "Agdal Pharmacy",
-    pharmacyNameArabic: "صيدلية أكدال",
-    cityCode: "RABAT",
-    pharmacyPhone: "+212 537 678901",
-    addressLatin: "56 Rue Ibn Sina, Agdal, Rabat",
-    addressArabic: "56 شارع ابن سينا، أكدال، الرباط",
-    latitude: 33.9716,
-    longitude: -6.8498
-  },
-  {
-    pharmacyNameLatin: "Fes Medina Pharmacy",
-    pharmacyNameArabic: "صيدلية فاس المدينة",
-    cityCode: "FES",
-    pharmacyPhone: "+212 535 789012",
-    addressLatin: "89 Boulevard Moulay Youssef, Fes",
-    addressArabic: "89 شارع مولاي يوسف، فاس",
-    latitude: 34.0181,
-    longitude: -5.0078
-  },
-  {
-    pharmacyNameLatin: "Boujeloud Pharmacy",
-    pharmacyNameArabic: "صيدلية باب بوجلود",
-    cityCode: "FES",
-    pharmacyPhone: "+212 535 890123",
-    addressLatin: "23 Bab Boujeloud, Fes",
-    addressArabic: "23 باب بوجلود، فاس",
-    latitude: 34.0633,
-    longitude: -4.9746
-  },
-  {
-    pharmacyNameLatin: "Tangier Port Pharmacy",
-    pharmacyNameArabic: "صيدلية ميناء طنجة",
-    cityCode: "TANGIER",
-    pharmacyPhone: "+212 539 901234",
-    addressLatin: "101 Avenue d'Espagne, Tangier",
-    addressArabic: "101 شارع إسبانيا، طنجة",
-    latitude: 35.7595,
-    longitude: -5.8340
-  },
-  {
-    pharmacyNameLatin: "Kasbah Pharmacy",
-    pharmacyNameArabic: "صيدلية القصبة",
-    cityCode: "TANGIER",
-    pharmacyPhone: "+212 539 012345",
-    addressLatin: "45 Place de la Kasbah, Tangier",
-    addressArabic: "45 ساحة القصبة، طنجة",
-    latitude: 35.7847,
-    longitude: -5.8119
-  },
-  {
-    pharmacyNameLatin: "Agadir Bay Pharmacy",
-    pharmacyNameArabic: "صيدلية خليج أكادير",
-    cityCode: "AGADIR",
-    pharmacyPhone: "+212 528 123456",
-    addressLatin: "67 Boulevard du 20 Août, Agadir",
-    addressArabic: "67 شارع 20 أغسطس، أكادير",
-    latitude: 30.4278,
-    longitude: -9.5981
-  },
-  {
-    pharmacyNameLatin: "Souss Pharmacy",
-    pharmacyNameArabic: "صيدلية سوس",
-    cityCode: "AGADIR",
-    pharmacyPhone: "+212 528 234567",
-    addressLatin: "34 Avenue Hassan II, Agadir",
-    addressArabic: "34 شارع الحسن الثاني، أكادير",
-    latitude: 30.4202,
-    longitude: -9.5982
-  },
-  {
-    pharmacyNameLatin: "Meknes Imperial Pharmacy",
-    pharmacyNameArabic: "صيدلية مكناس الإمبراطورية",
-    cityCode: "MEKNES",
-    pharmacyPhone: "+212 535 345678",
-    addressLatin: "12 Avenue Mohammed V, Meknes",
-    addressArabic: "12 شارع محمد الخامس، مكناس",
-    latitude: 33.8935,
-    longitude: -5.5473
-  },
-  {
-    pharmacyNameLatin: "Oujda East Pharmacy",
-    pharmacyNameArabic: "صيدلية وجدة الشرقية",
-    cityCode: "OUJDA",
-    pharmacyPhone: "+212 536 456789",
-    addressLatin: "88 Boulevard Derfoufi, Oujda",
-    addressArabic: "88 شارع درفوفي، وجدة",
-    latitude: 34.6814,
-    longitude: -1.9086
-  },
-  {
-    pharmacyNameLatin: "Tetouan Plaza Pharmacy",
-    pharmacyNameArabic: "صيدلية تطوان بلازا",
-    cityCode: "TETOUAN",
-    pharmacyPhone: "+212 539 567890",
-    addressLatin: "56 Avenue Mohammed V, Tetouan",
-    addressArabic: "56 شارع محمد الخامس، تطوان",
-    latitude: 35.5889,
-    longitude: -5.3626
-  },
-  {
-    pharmacyNameLatin: "Kenitra Marina Pharmacy",
-    pharmacyNameArabic: "صيدلية القنيطرة المارينا",
-    cityCode: "KENITRA",
-    pharmacyPhone: "+212 537 678901",
-    addressLatin: "23 Avenue Hassan II, Kenitra",
-    addressArabic: "23 شارع الحسن الثاني، القنيطرة",
-    latitude: 34.2610,
-    longitude: -6.5802
-  },
-  {
-    pharmacyNameLatin: "Beni Mellal Center Pharmacy",
-    pharmacyNameArabic: "صيدلية بني ملال المركز",
-    cityCode: "BENI_MELLAL",
-    pharmacyPhone: "+212 523 789012",
-    addressLatin: "45 Boulevard Mohammed VI, Beni Mellal",
-    addressArabic: "45 شارع محمد السادس، بني ملال",
-    latitude: 32.3394,
-    longitude: -6.3498
-  },
-  {
-    pharmacyNameLatin: "El Jadida Coastal Pharmacy",
-    pharmacyNameArabic: "صيدلية الجديدة الساحلية",
-    cityCode: "EL_JADIDA",
-    pharmacyPhone: "+212 523 890123",
-    addressLatin: "78 Avenue Mohammed V, El Jadida",
-    addressArabic: "78 شارع محمد الخامس، الجديدة",
-    latitude: 33.2316,
-    longitude: -8.5007
-  },
-  {
-    pharmacyNameLatin: "Nador Mediterranean Pharmacy",
-    pharmacyNameArabic: "صيدلية الناظور المتوسطية",
-    cityCode: "NADOR",
-    pharmacyPhone: "+212 536 901234",
-    addressLatin: "90 Boulevard Youssef Ben Tachfine, Nador",
-    addressArabic: "90 شارع يوسف بن تاشفين، الناظور",
-    latitude: 35.1681,
-    longitude: -2.9332
-  },
-  {
-    pharmacyNameLatin: "Safi Harbor Pharmacy",
-    pharmacyNameArabic: "صيدلية ميناء آسفي",
-    cityCode: "SAFI",
-    pharmacyPhone: "+212 524 012345",
-    addressLatin: "34 Rue de la Marine, Safi",
-    addressArabic: "34 شارع البحرية، آسفي",
-    latitude: 32.2994,
-    longitude: -9.2372
-  }
-];
+const cities = LIST_OF_CITIES;
 
 const translations = {
   en: {
@@ -284,8 +84,12 @@ export default function Home() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
+    const savedLanguage = localStorage.getItem('language');
     if (savedTheme === 'dark') {
       setIsDarkMode(true);
+    }
+    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'fr' || savedLanguage === 'ar')) {
+      setLanguage(savedLanguage as 'en' | 'fr' | 'ar');
     }
   }, []);
 
@@ -295,13 +99,14 @@ export default function Home() {
     localStorage.setItem('theme', newMode ? 'dark' : 'light');
   };
 
+  const changeLanguage = (lang: 'en' | 'fr' | 'ar') => {
+    setLanguage(lang);
+    localStorage.setItem('language', lang);
+  };
+
   const t = translations[language];
   const isRTL = language === 'ar';
 
-  const cities = useMemo(() => {
-    const uniqueCities = Array.from(new Set(MOCK_PHARMACIES.map(p => p.cityCode)));
-    return uniqueCities.sort();
-  }, []);
 
   useEffect(() => {
     const loadPharmacies = async () => {
@@ -310,9 +115,8 @@ export default function Home() {
         const data = await fetchPharmaciesByCity(selectedCity);
         setPharmacies(data);
       } catch (error) {
-        console.error('Failed to fetch pharmacies from API, using fallback data:', error);
-        const filtered = MOCK_PHARMACIES.filter(p => p.cityCode === selectedCity);
-        setPharmacies(filtered);
+        console.error('Failed to fetch pharmacies from API:', error);
+        setPharmacies([]);
       } finally {
         setLoading(false);
       }
@@ -344,11 +148,6 @@ export default function Home() {
     return language === 'ar' ? pharmacy.addressArabic : pharmacy.addressLatin;
   };
 
-  const formatCityName = (cityCode: string) => {
-    return cityCode.split('_').map(word =>
-      word.charAt(0) + word.slice(1).toLowerCase()
-    ).join(' ');
-  };
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white' : 'bg-gradient-to-br from-gray-50 via-blue-50 to-gray-50 text-gray-900'} ${isRTL ? 'rtl' : 'ltr'} transition-colors duration-300`}>
@@ -356,7 +155,7 @@ export default function Home() {
         <header className={`mb-8 lg:mb-12 ${isRTL ? 'text-right' : 'text-left'}`}>
           <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
             <div>
-              <h1 className="text-3xl lg:text-5xl font-bold bg-gradient-to-r from-teal-400 to-lime-400 bg-clip-text text-transparent mb-2">
+              <h1 className="text-3xl lg:text-5xl font-bold bg-gradient-to-r from-teal-400 to-lime-400 bg-clip-text text-transparent mb-3 lg:mb-4">
                 {t.title}
               </h1>
               <p className={`text-sm lg:text-base ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>{t.subtitle}</p>
@@ -377,19 +176,19 @@ export default function Home() {
                 {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
               </button>
               <button
-                onClick={() => setLanguage('en')}
+                onClick={() => changeLanguage('en')}
                 className={`px-3 py-2 rounded-lg transition-all ${language === 'en' ? 'bg-teal-500 text-white' : isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'}`}
               >
                 EN
               </button>
               <button
-                onClick={() => setLanguage('fr')}
+                onClick={() => changeLanguage('fr')}
                 className={`px-3 py-2 rounded-lg transition-all ${language === 'fr' ? 'bg-teal-500 text-white' : isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'}`}
               >
                 FR
               </button>
               <button
-                onClick={() => setLanguage('ar')}
+                onClick={() => changeLanguage('ar')}
                 className={`px-3 py-2 rounded-lg transition-all ${language === 'ar' ? 'bg-teal-500 text-white' : isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'}`}
               >
                 العربية
@@ -438,7 +237,7 @@ export default function Home() {
                       <div className={`text-xs font-semibold mb-1 mt-3 ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Language</div>
                       <button
                         onClick={() => {
-                          setLanguage('en');
+                          changeLanguage('en');
                           setIsMenuOpen(false);
                         }}
                         className={`px-4 py-2 rounded-lg transition-all ${language === 'en' ? 'bg-teal-500 text-white' : isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
@@ -447,7 +246,7 @@ export default function Home() {
                       </button>
                       <button
                         onClick={() => {
-                          setLanguage('fr');
+                          changeLanguage('fr');
                           setIsMenuOpen(false);
                         }}
                         className={`px-4 py-2 rounded-lg transition-all ${language === 'fr' ? 'bg-teal-500 text-white' : isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
@@ -456,7 +255,7 @@ export default function Home() {
                       </button>
                       <button
                         onClick={() => {
-                          setLanguage('ar');
+                          changeLanguage('ar');
                           setIsMenuOpen(false);
                         }}
                         className={`px-4 py-2 rounded-lg transition-all ${language === 'ar' ? 'bg-teal-500 text-white' : isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
@@ -501,7 +300,7 @@ export default function Home() {
                 className={`w-full ${isRTL ? 'pr-4 pl-10' : 'pl-4 pr-10'} py-3 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-gray-300 text-gray-900'} border rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all appearance-none ${isRTL ? 'text-right' : 'text-left'}`}
               >
                 {cities.map(city => (
-                  <option key={city} value={city}>{formatCityName(city)}</option>
+                  <option key={city.id} value={city.city}>{getCityName(city.city, language)}</option>
                 ))}
               </select>
               <div className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? 'left-4' : 'right-4'} ${isDarkMode ? 'text-slate-400' : 'text-gray-500'} pointer-events-none`}>
@@ -542,7 +341,7 @@ export default function Home() {
                         {getPharmacyName(pharmacy)}
                       </h3>
                       <span className="text-xs px-2 py-1 bg-lime-500/20 text-lime-400 rounded-lg whitespace-nowrap ml-2">
-                        {formatCityName(pharmacy.cityCode)}
+                        {getCityName(pharmacy.cityCode, language)}
                       </span>
                     </div>
 

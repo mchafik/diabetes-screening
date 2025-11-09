@@ -15,10 +15,19 @@ export default function RiskAssessmentPage() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
+    const savedLanguage = localStorage.getItem('language');
     if (savedTheme === 'dark') {
       setIsDarkMode(true);
     }
+    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'fr' || savedLanguage === 'ar')) {
+      setLanguage(savedLanguage as 'en' | 'fr' | 'ar');
+    }
   }, []);
+
+  const changeLanguage = (lang: 'en' | 'fr' | 'ar') => {
+    setLanguage(lang);
+    localStorage.setItem('language', lang);
+  };
 
   const isRTL = language === 'ar';
 
@@ -79,7 +88,7 @@ export default function RiskAssessmentPage() {
 
           <div className="flex gap-2">
             <button
-              onClick={() => setLanguage('en')}
+              onClick={() => changeLanguage('en')}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 language === 'en'
                   ? 'bg-teal-500 text-white'
@@ -91,7 +100,7 @@ export default function RiskAssessmentPage() {
               EN
             </button>
             <button
-              onClick={() => setLanguage('fr')}
+              onClick={() => changeLanguage('fr')}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 language === 'fr'
                   ? 'bg-teal-500 text-white'
@@ -103,7 +112,7 @@ export default function RiskAssessmentPage() {
               FR
             </button>
             <button
-              onClick={() => setLanguage('ar')}
+              onClick={() => changeLanguage('ar')}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 language === 'ar'
                   ? 'bg-teal-500 text-white'
