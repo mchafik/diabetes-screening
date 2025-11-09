@@ -9,7 +9,7 @@ export interface City {
 export const LIST_OF_CITIES: City[] = [
   {
     id: 1,
-    city: "BENSLIMANE",
+    city: "BEN-SLIMANE",
     city_name_english: "Benslimane",
     city_name_arabic: "بن سليمان",
     city_name_french: "Benslimane"
@@ -45,7 +45,7 @@ export const LIST_OF_CITIES: City[] = [
   {
     id: 6,
     city: "KENITRA",
-    city_name_english: "Kénitra",
+    city_name_english: "Kenitra",
     city_name_arabic: "القنيطرة",
     city_name_french: "Kénitra"
   },
@@ -58,15 +58,15 @@ export const LIST_OF_CITIES: City[] = [
   },
   {
     id: 8,
-    city: "LARACH",
+    city: "LARACHE",
     city_name_english: "Larache",
     city_name_arabic: "العرائش",
     city_name_french: "Larache"
   },
   {
     id: 9,
-    city: "MARAKECH",
-    city_name_english: "Marrakech",
+    city: "MARRAKESH",
+    city_name_english: "Marrakesh",
     city_name_arabic: "مراكش",
     city_name_french: "Marrakech"
   },
@@ -94,13 +94,13 @@ export const LIST_OF_CITIES: City[] = [
   {
     id: 13,
     city: "SALE",
-    city_name_english: "Salé",
+    city_name_english: "Sale",
     city_name_arabic: "سلا",
     city_name_french: "Salé"
   },
   {
     id: 14,
-    city: "TANGER",
+    city: "TANGIER",
     city_name_english: "Tangier",
     city_name_arabic: "طنجة",
     city_name_french: "Tanger"
@@ -108,14 +108,14 @@ export const LIST_OF_CITIES: City[] = [
   {
     id: 15,
     city: "TEMARA",
-    city_name_english: "Témara",
+    city_name_english: "Temara",
     city_name_arabic: "تمارة",
     city_name_french: "Témara"
   },
   {
     id: 16,
-    city: "TETOUAN",
-    city_name_english: "Tétouan",
+    city: "TETOUN",
+    city_name_english: "Tetouan",
     city_name_arabic: "تطوان",
     city_name_french: "Tétouan"
   }
