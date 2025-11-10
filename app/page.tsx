@@ -169,7 +169,7 @@ export default function Home() {
         <header className={`mb-8 lg:mb-12 ${isRTL ? 'text-right' : 'text-left'}`}>
           <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
             <div>
-              <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-teal-400 to-lime-400 bg-clip-text text-transparent mb-3 lg:mb-4">
+              <h1 className="text-3xl lg:text-5xl font-bold bg-gradient-to-r from-teal-400 to-lime-400 bg-clip-text text-transparent mb-3 lg:mb-4">
                 {t.title}
               </h1>
               <p className={`text-sm lg:text-base ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>{t.subtitle}</p>
