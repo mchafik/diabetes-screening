@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, MapPin, Phone, Globe, X, Sun, Moon, Menu, ClipboardList } from 'lucide-react';
+import { Search, MapPin, Phone, Globe, X, Sun, Moon, Menu, ClipboardList, QrCode } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { fetchPharmaciesByCity } from '@/lib/pharmacyApi';
@@ -41,7 +42,9 @@ const translations = {
     selectOnMap: "Click to view on map",
     noResults: "No pharmacies found",
     loading: "Loading pharmacies...",
-    riskAssessment: "Risk Assessment"
+    riskAssessment: "Risk Assessment",
+    qrCode: "QR Code",
+    qrDescription: "Scan to visit depistage.ma"
   },
   fr: {
     title: "Dépistage Diabétique",
@@ -54,7 +57,9 @@ const translations = {
     selectOnMap: "Cliquez pour voir sur la carte",
     noResults: "Aucune pharmacie trouvée",
     loading: "Chargement des pharmacies...",
-    riskAssessment: "Évaluation des risques"
+    riskAssessment: "Évaluation des risques",
+    qrCode: "Code QR",
+    qrDescription: "Scanner pour visiter depistage.ma"
   },
   ar: {
     title: "فحص السكري",
@@ -67,7 +72,9 @@ const translations = {
     selectOnMap: "انقر للعرض على الخريطة",
     noResults: "لم يتم العثور على صيدليات",
     loading: "جاري تحميل الصيدليات...",
-    riskAssessment: "تقييم المخاطر"
+    riskAssessment: "تقييم المخاطر",
+    qrCode: "رمز الاستجابة السريعة",
+    qrDescription: "امسح ضوئيًا لزيارة depistage.ma"
   }
 };
 
@@ -80,6 +87,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isQrOpen, setIsQrOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -170,6 +178,12 @@ export default function Home() {
                 <span className="font-medium">{t.riskAssessment}</span>
               </button>
               <button
+                onClick={() => setIsQrOpen(true)}
+                className={`px-3 py-2 rounded-lg transition-all ${isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'}`}
+              >
+                <QrCode size={20} />
+              </button>
+              <button
                 onClick={toggleDarkMode}
                 className={`px-3 py-2 rounded-lg transition-all ${isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'}`}
               >
@@ -211,15 +225,16 @@ export default function Home() {
                   />
                   <div className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-full mt-2 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200'} border rounded-xl shadow-2xl p-4 z-50 min-w-[200px]`}>
                     <div className="flex flex-col gap-2">
+                      <div className={`text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Share</div>
                       <button
                         onClick={() => {
-                          router.push('/risk-assessment');
+                          setIsQrOpen(true);
                           setIsMenuOpen(false);
                         }}
-                        className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-medium`}
+                        className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                       >
-                        <ClipboardList size={18} />
-                        <span>{t.riskAssessment}</span>
+                        <QrCode size={18} />
+                        <span>{t.qrCode}</span>
                       </button>
 
                       <div className={`text-xs font-semibold mb-1 mt-3 ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Theme</div>
@@ -375,6 +390,22 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <Dialog open={isQrOpen} onOpenChange={setIsQrOpen}>
+        <DialogContent className={`sm:max-w-md ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white'}`}>
+          <DialogHeader>
+            <DialogTitle className={`text-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{t.qrCode}</DialogTitle>
+            <DialogDescription className={`text-center ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>
+              {t.qrDescription}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-center p-6">
+            <div className="bg-white p-4 rounded-2xl shadow-lg">
+              <img src="/qrcode.svg" alt="QR Code for depistage.ma" className="w-64 h-64" />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {

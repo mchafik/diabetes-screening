@@ -47,7 +47,7 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
       center: [31.7917, -7.0926],
       zoom: 6,
       zoomControl: true,
-      minZoom: 8,
+      minZoom: 9,
     });
 
     const tileLayer = isDarkMode
