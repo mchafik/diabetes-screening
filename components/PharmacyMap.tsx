@@ -47,7 +47,7 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
       center: [31.7917, -7.0926],
       zoom: 6,
       zoomControl: true,
-      minZoom: 10,
+      minZoom: 8,
     });
 
     const tileLayer = isDarkMode
@@ -224,8 +224,10 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
               });
 
               setTimeout(() => {
-                marker.openPopup();
-              }, 300);
+                if (!marker.isPopupOpen()) {
+                  marker.openPopup();
+                }
+              }, 900);
             }
           });
         } else {
@@ -236,8 +238,10 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
             });
 
             setTimeout(() => {
-              marker.openPopup();
-            }, 300);
+              if (!marker.isPopupOpen()) {
+                marker.openPopup();
+              }
+            }, 900);
           }
         }
       } else {
