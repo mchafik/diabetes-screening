@@ -15,6 +15,9 @@ const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssess
   const [answers, setAnswers] = useState<AssessmentAnswers>({});
   const [showResults, setShowResults] = useState(false);
   const [showBmiHelper, setShowBmiHelper] = useState(false);
+  const [glycemiaValue, setGlycemiaValue] = useState('');
+  const [glycemiaMeasurement, setGlycemiaMeasurement] = useState('');
+  const [glycemiaInterpretation, setGlycemiaInterpretation] = useState('');
   const isRTL = language === 'ar';
 
   const handleAnswerChange = (questionId: string, points: number) => {
@@ -37,6 +40,9 @@ const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssess
   const handleReset = () => {
     setAnswers({});
     setShowResults(false);
+    setGlycemiaValue('');
+    setGlycemiaMeasurement('');
+    setGlycemiaInterpretation('');
   };
 
   const getResultLevel = (score: number) => {
@@ -75,6 +81,19 @@ const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssess
       underweight: 'Underweight',
       height: 'Height (m)',
       weight: 'Weight (kg)',
+      additionalQuestions: 'Additional Questions',
+      glycemiaValue: 'Blood glucose value found in g/L (Example: 1.10 g/L)',
+      glycemiaMeasurement: 'Glycemia measured',
+      glycemiaInterpretation: 'Interpretation',
+      fastingGlycemia: 'Fasting glycemia',
+      postprandialGlycemia: 'Postprandial glycemia exactly 2 hours after meal',
+      randomGlycemia: 'Glycemia at any time: beyond 2 hours after meal',
+      prediabetes: 'Prediabetes between 1.1 g/L and 1.26 g/L',
+      fastingAbnormal: 'Fasting blood glucose ≥ 1.26 g/L',
+      postprandialAbnormal: 'Postprandial glycemia ≥ 1.4 g/L',
+      randomAbnormal: 'Glycemia at any time > 2 g/L',
+      normal: 'Fasting or postprandial glycemia normal',
+      submitFinal: 'Submit Final Assessment',
     },
     fr: {
       backToList: 'Retour aux évaluations',
@@ -93,6 +112,19 @@ const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssess
       underweight: 'Maigreur',
       height: 'Taille (m)',
       weight: 'Poids (kg)',
+      additionalQuestions: 'Questions supplémentaires',
+      glycemiaValue: 'Valeur de glycémie trouvée en g/L (Exemple : 1,10 g/L)',
+      glycemiaMeasurement: 'Glycémie mesurée',
+      glycemiaInterpretation: 'Interprétation',
+      fastingGlycemia: 'Glycémie à jeun',
+      postprandialGlycemia: 'Glycémie post prandiale exactement 2 heures après repas',
+      randomGlycemia: 'Glycémie à n\'importe quel moment : au delà de 2 heures après repas',
+      prediabetes: 'Prédiabète entre 1,1 g/L et 1,26 g/L',
+      fastingAbnormal: 'GAJ ≥ 1,26 g/L',
+      postprandialAbnormal: 'Glycémie Post Prandiale ≥ 1,4 g/L',
+      randomAbnormal: 'Glycémie à n\'importe quel moment supérieure à 2 g/L',
+      normal: 'GAJ ou GPP Normale',
+      submitFinal: 'Soumettre l\'évaluation finale',
     },
     ar: {
       backToList: 'العودة إلى التقييمات',
@@ -111,6 +143,19 @@ const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssess
       underweight: 'نقص وزن',
       height: 'الطول (م)',
       weight: 'الوزن (كغ)',
+      additionalQuestions: 'أسئلة إضافية',
+      glycemiaValue: 'قيمة الجلوكوز في الدم بالجرام/لتر (مثال: 1.10 جم/لتر)',
+      glycemiaMeasurement: 'قياس نسبة السكر في الدم',
+      glycemiaInterpretation: 'التفسير',
+      fastingGlycemia: 'نسبة السكر في الدم أثناء الصيام',
+      postprandialGlycemia: 'نسبة السكر في الدم بعد الأكل بساعتين بالضبط',
+      randomGlycemia: 'نسبة السكر في الدم في أي وقت: بعد ساعتين من الأكل',
+      prediabetes: 'مقدمات السكري بين 1.1 و 1.26 جم/لتر',
+      fastingAbnormal: 'نسبة السكر أثناء الصيام ≥ 1.26 جم/لتر',
+      postprandialAbnormal: 'نسبة السكر بعد الأكل ≥ 1.4 جم/لتر',
+      randomAbnormal: 'نسبة السكر في أي وقت > 2 جم/لتر',
+      normal: 'نسبة السكر أثناء الصيام أو بعد الأكل طبيعية',
+      submitFinal: 'إرسال التقييم النهائي',
     },
   };
 
@@ -166,23 +211,109 @@ const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssess
                 </div>
               </div>
 
-              <div className="flex gap-4">
-                <button
-                  onClick={handleReset}
-                  className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all ${
-                    isDarkMode
-                      ? 'bg-slate-700 hover:bg-slate-600 text-white'
-                      : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
-                  }`}
-                >
-                  {t.reset}
-                </button>
-                <button
-                  onClick={onBack}
-                  className="flex-1 py-3 px-6 bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-medium transition-all"
-                >
-                  {t.backToList}
-                </button>
+              {score > 7 && (
+                <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-slate-800' : 'bg-white'} border-2 ${isDarkMode ? 'border-teal-500/30' : 'border-teal-200'}`}>
+                  <h3 className={`text-xl font-bold text-teal-400 mb-6 ${isRTL ? 'text-right' : 'text-left'}`}>{t.additionalQuestions}</h3>
+
+                  <div className="space-y-6">
+                    <div>
+                      <label className={`block font-semibold mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
+                        1. {t.glycemiaValue}
+                      </label>
+                      <input
+                        type="text"
+                        value={glycemiaValue}
+                        onChange={(e) => setGlycemiaValue(e.target.value)}
+                        placeholder="1.10"
+                        className={`w-full p-3 rounded-lg border-2 ${isDarkMode ? 'bg-slate-700 border-slate-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:border-teal-500 focus:outline-none`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className={`block font-semibold mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
+                        2. {t.glycemiaMeasurement}
+                      </label>
+                      <div className="space-y-3">
+                        {[
+                          { value: 'fasting', label: t.fastingGlycemia },
+                          { value: 'postprandial', label: t.postprandialGlycemia },
+                          { value: 'random', label: t.randomGlycemia },
+                        ].map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => setGlycemiaMeasurement(option.value)}
+                            className={`w-full p-4 rounded-lg border-2 transition-all ${isRTL ? 'text-right' : 'text-left'} ${
+                              glycemiaMeasurement === option.value
+                                ? 'border-teal-500 bg-teal-500/20'
+                                : isDarkMode
+                                ? 'border-slate-600 hover:border-teal-500/50 bg-slate-700'
+                                : 'border-gray-300 hover:border-teal-500/50 bg-white'
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className={`block font-semibold mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
+                        3. {t.glycemiaInterpretation}
+                      </label>
+                      <div className="space-y-3">
+                        {[
+                          { value: 'prediabetes', label: t.prediabetes },
+                          { value: 'fasting_abnormal', label: t.fastingAbnormal },
+                          { value: 'postprandial_abnormal', label: t.postprandialAbnormal },
+                          { value: 'random_abnormal', label: t.randomAbnormal },
+                          { value: 'normal', label: t.normal },
+                        ].map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => setGlycemiaInterpretation(option.value)}
+                            className={`w-full p-4 rounded-lg border-2 transition-all ${isRTL ? 'text-right' : 'text-left'} ${
+                              glycemiaInterpretation === option.value
+                                ? 'border-teal-500 bg-teal-500/20'
+                                : isDarkMode
+                                ? 'border-slate-600 hover:border-teal-500/50 bg-slate-700'
+                                : 'border-gray-300 hover:border-teal-500/50 bg-white'
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-col gap-4">
+                {score > 7 && glycemiaValue && glycemiaMeasurement && glycemiaInterpretation && (
+                  <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-teal-500/20' : 'bg-teal-50'} border ${isDarkMode ? 'border-teal-500/50' : 'border-teal-200'}`}>
+                    <p className={`text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>
+                      {t.glycemiaValue}: <span className="text-teal-500">{glycemiaValue} g/L</span>
+                    </p>
+                  </div>
+                )}
+                <div className="flex gap-4">
+                  <button
+                    onClick={handleReset}
+                    className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all ${
+                      isDarkMode
+                        ? 'bg-slate-700 hover:bg-slate-600 text-white'
+                        : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
+                    }`}
+                  >
+                    {t.reset}
+                  </button>
+                  <button
+                    onClick={onBack}
+                    className="flex-1 py-3 px-6 bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-medium transition-all"
+                  >
+                    {t.backToList}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

@@ -110,7 +110,7 @@ export const assessments: Assessment[] = [
     riskLevels: [
       {
         minScore: 0,
-        maxScore: 6,
+        maxScore: 7,
         labelEn: 'Small Risk',
         labelFr: 'Risque faible',
         labelAr: 'خطر منخفض',
@@ -120,7 +120,7 @@ export const assessments: Assessment[] = [
         color: 'green',
       },
       {
-        minScore: 7,
+        minScore: 8,
         maxScore: 11,
         labelEn: 'Slightly High Risk',
         labelFr: 'Risque légèrement élevé',
