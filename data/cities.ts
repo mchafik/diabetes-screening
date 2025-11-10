@@ -38,8 +38,8 @@ export const LIST_OF_CITIES: City[] = [
   {
     id: 5,
     city: "IMINTANOUT",
-    city_name_english: "Imintanoute",
-    city_name_arabic: "إمنتانوت",
+    city_name_english: "Imintanout",
+    city_name_arabic: "إيمنتانوت",
     city_name_french: "Imintanout"
   },
   {
@@ -118,6 +118,111 @@ export const LIST_OF_CITIES: City[] = [
     city_name_english: "Tetouan",
     city_name_arabic: "تطوان",
     city_name_french: "Tétouan"
+  },
+  {
+    id: 17,
+    city: "AIN-HARROUDA",
+    city_name_english: "Ain Harrouda",
+    city_name_arabic: "عين حرودة",
+    city_name_french: "Ain Harrouda"
+  },
+  {
+    id: 18,
+    city: "ARRAHMA",
+    city_name_english: "Arrahma",
+    city_name_arabic: "الرحمة",
+    city_name_french: "Arrahma"
+  },
+  {
+    id: 19,
+    city: "ASNI",
+    city_name_english: "Asni",
+    city_name_arabic: "أسني",
+    city_name_french: "Asni"
+  },
+  {
+    id: 20,
+    city: "BENI-YAKHLEF",
+    city_name_english: "Beni Yakhlef",
+    city_name_arabic: "بني يخلف",
+    city_name_french: "Beni Yakhlef"
+  },
+  {
+    id: 21,
+    city: "LAHBICHAT",
+    city_name_english: "Lahbichat",
+    city_name_arabic: "لحبيشات",
+    city_name_french: "Lahbichat"
+  },
+  {
+    id: 22,
+    city: "MARTIL",
+    city_name_english: "Martil",
+    city_name_arabic: "مرتيل",
+    city_name_french: "Martil"
+  },
+  {
+    id: 23,
+    city: "MERS-EL-KHEIR",
+    city_name_english: "Mers El Kheir",
+    city_name_arabic: "مرس الخير",
+    city_name_french: "Mers El Kheir"
+  },
+  {
+    id: 24,
+    city: "NOUACER",
+    city_name_english: "Nouacer",
+    city_name_arabic: "النواصر",
+    city_name_french: "Nouacer"
+  },
+  {
+    id: 25,
+    city: "OUAHAT-SIDI-BRAHIM",
+    city_name_english: "Ouahat Sidi Brahim",
+    city_name_arabic: "وحات سيدي ابراهيم",
+    city_name_french: "Ouahat Sidi Brahim"
+  },
+  {
+    id: 26,
+    city: "OULED-YAHYA",
+    city_name_english: "Ouled Yahya",
+    city_name_arabic: "أولاد يحيى",
+    city_name_french: "Ouled Yahya"
+  },
+  {
+    id: 27,
+    city: "SEFROU",
+    city_name_english: "Sefrou",
+    city_name_arabic: "صفرو",
+    city_name_french: "Sefrou"
+  },
+  {
+    id: 28,
+    city: "SIDI-BOUOUTHMAN",
+    city_name_english: "Sidi BouoUthman",
+    city_name_arabic: "سيدي بوعثمان",
+    city_name_french: "Sidi BouoUthman"
+  },
+  {
+    id: 29,
+    city: "SIDI-MOUSSA",
+    city_name_english: "Sidi Moussa",
+    city_name_arabic: "سيدي موسى",
+    city_name_french: "Sidi Moussa"
+  },
+  {
+    id: 30,
+    city: "SIDI-RAHAL",
+    city_name_english: "Sidi Rahal",
+    city_name_arabic: "سيدي رحال",
+    city_name_french: "Sidi Rahal"
+  },
+  {
+    id: 31,
+    city: "ZENATA",
+    city_name_english: "Zenata",
+    city_name_arabic: "زناتة",
+    city_name_french: "Zenata"
   }
 ];
 
