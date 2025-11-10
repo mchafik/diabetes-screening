@@ -203,14 +203,42 @@ const PharmacyMap = ({ pharmacies, selectedPharmacy, onPharmacySelect, isDarkMod
   }, [pharmacies, language]);
 
   useEffect(() => {
-    if (!mapRef.current || markersRef.current.size === 0) return;
+    if (!mapRef.current || !markerClusterGroupRef.current || markersRef.current.size === 0) return;
 
     markersRef.current.forEach((marker, pharmacy) => {
       const isSelected = selectedPharmacy === pharmacy;
       marker.setIcon(customIcon(isSelected));
 
       if (isSelected) {
-        marker.openPopup();
+        const markerLatLng = marker.getLatLng();
+
+        const visibleOne = markerClusterGroupRef.current!.getVisibleParent(marker);
+
+        if (visibleOne instanceof L.MarkerCluster) {
+          markerClusterGroupRef.current!.zoomToShowLayer(marker, () => {
+            if (mapRef.current) {
+              mapRef.current.setView(markerLatLng, Math.max(mapRef.current.getZoom(), 16), {
+                animate: true,
+                duration: 0.8
+              });
+
+              setTimeout(() => {
+                marker.openPopup();
+              }, 300);
+            }
+          });
+        } else {
+          if (mapRef.current) {
+            mapRef.current.setView(markerLatLng, Math.max(mapRef.current.getZoom(), 16), {
+              animate: true,
+              duration: 0.8
+            });
+
+            setTimeout(() => {
+              marker.openPopup();
+            }, 300);
+          }
+        }
       } else {
         marker.closePopup();
       }
