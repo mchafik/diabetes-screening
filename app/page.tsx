@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, MapPin, Phone, Globe, X, Sun, Moon, Menu, ClipboardList, QrCode } from 'lucide-react';
+import { Search, MapPin, Phone, Globe, X, Sun, Moon, Menu, ClipboardList, QrCode, Navigation } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
@@ -44,7 +44,9 @@ const translations = {
     loading: "Loading pharmacies...",
     riskAssessment: "Risk Assessment",
     qrCode: "QR Code",
-    qrDescription: "Scan to visit depistage.ma"
+    qrDescription: "Scan to visit depistage.ma",
+    googleMaps: "Google Maps",
+    waze: "Waze"
   },
   fr: {
     title: "Dépistage Diabétique",
@@ -59,7 +61,9 @@ const translations = {
     loading: "Chargement des pharmacies...",
     riskAssessment: "Évaluation des risques",
     qrCode: "Code QR",
-    qrDescription: "Scanner pour visiter depistage.ma"
+    qrDescription: "Scanner pour visiter depistage.ma",
+    googleMaps: "Google Maps",
+    waze: "Waze"
   },
   ar: {
     title: "فحص السكري",
@@ -74,7 +78,9 @@ const translations = {
     loading: "جاري تحميل الصيدليات...",
     riskAssessment: "تقييم المخاطر",
     qrCode: "رمز الاستجابة السريعة",
-    qrDescription: "امسح ضوئيًا لزيارة depistage.ma"
+    qrDescription: "امسح ضوئيًا لزيارة depistage.ma",
+    googleMaps: "Google Maps",
+    waze: "Waze"
   }
 };
 
@@ -370,8 +376,35 @@ export default function Home() {
                       <span dir="ltr">{pharmacy.pharmacyPhone}</span>
                     </div>
 
-                    <div className={`mt-3 text-xs text-teal-400 ${isRTL ? 'text-right' : 'text-left'}`}>
-                      {t.selectOnMap} →
+                    <div className={`mt-4 flex gap-2 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${pharmacy.latitude},${pharmacy.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className={`flex-1 py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-medium ${
+                          isDarkMode
+                            ? 'bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30'
+                            : 'bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200'
+                        }`}
+                      >
+                        <Navigation size={16} />
+                        <span>{t.googleMaps}</span>
+                      </a>
+                      <a
+                        href={`https://waze.com/ul?ll=${pharmacy.latitude},${pharmacy.longitude}&navigate=yes`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className={`flex-1 py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-medium ${
+                          isDarkMode
+                            ? 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/30'
+                            : 'bg-cyan-50 hover:bg-cyan-100 text-cyan-600 border border-cyan-200'
+                        }`}
+                      >
+                        <Navigation size={16} />
+                        <span>{t.waze}</span>
+                      </a>
                     </div>
                   </div>
                 ))
