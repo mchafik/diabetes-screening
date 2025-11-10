@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 
 export const metadata: Metadata = {
-  title: 'depistage.ai',
+  title: 'Depistage Diabetique',
   description: 'Depistage Diabetique, Diabetes Screening, Pharmacies Locations and Risk Assessments - Morocco',
   icons: {
     icon: '/favicon.svg',
