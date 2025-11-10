@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Info } from 'lucide-react';
 import { Assessment, AssessmentAnswers } from '@/types/assessment';
 
 interface RiskAssessmentProps {
@@ -14,6 +14,7 @@ interface RiskAssessmentProps {
 const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssessmentProps) => {
   const [answers, setAnswers] = useState<AssessmentAnswers>({});
   const [showResults, setShowResults] = useState(false);
+  const [showBmiHelper, setShowBmiHelper] = useState(false);
   const isRTL = language === 'ar';
 
   const handleAnswerChange = (questionId: string, points: number) => {
@@ -65,6 +66,15 @@ const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssess
       riskLevel: 'Risk Level',
       allQuestionsRequired: 'Please answer all questions',
       selectOption: 'Select an option',
+      points: 'pts',
+      bmiHelper: 'BMI Helper',
+      bmiDescription: 'Use the chart below to find your BMI based on your height and weight',
+      obese: 'Obese',
+      overweight: 'Overweight',
+      normalWeight: 'Normal Weight',
+      underweight: 'Underweight',
+      height: 'Height (m)',
+      weight: 'Weight (kg)',
     },
     fr: {
       backToList: 'Retour aux évaluations',
@@ -74,6 +84,15 @@ const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssess
       riskLevel: 'Niveau de risque',
       allQuestionsRequired: 'Veuillez répondre à toutes les questions',
       selectOption: 'Sélectionnez une option',
+      points: 'pts',
+      bmiHelper: 'Aide IMC',
+      bmiDescription: 'Utilisez le tableau ci-dessous pour trouver votre IMC',
+      obese: 'Obésité',
+      overweight: 'Embonpoint',
+      normalWeight: 'Poids normal',
+      underweight: 'Maigreur',
+      height: 'Taille (m)',
+      weight: 'Poids (kg)',
     },
     ar: {
       backToList: 'العودة إلى التقييمات',
@@ -83,6 +102,15 @@ const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssess
       riskLevel: 'مستوى المخاطر',
       allQuestionsRequired: 'يرجى الإجابة على جميع الأسئلة',
       selectOption: 'اختر خيارًا',
+      points: 'نقاط',
+      bmiHelper: 'مساعد مؤشر كتلة الجسم',
+      bmiDescription: 'استخدم المخطط أدناه لإيجاد مؤشر كتلة جسمك',
+      obese: 'سمنة',
+      overweight: 'زيادة وزن',
+      normalWeight: 'وزن طبيعي',
+      underweight: 'نقص وزن',
+      height: 'الطول (م)',
+      weight: 'الوزن (كغ)',
     },
   };
 
@@ -187,12 +215,81 @@ const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssess
           <div className="space-y-8">
             {assessment.questions.map((question, qIndex) => {
               const questionText = language === 'ar' ? question.textAr : language === 'fr' ? question.textFr : question.textEn;
+              const isBmiQuestion = question.id === 'q9';
 
               return (
                 <div key={question.id} className={`p-6 rounded-xl ${isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'}`}>
-                  <h3 className={`font-semibold mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
-                    {qIndex + 1}. {questionText}
-                  </h3>
+                  <div className={`flex items-start justify-between mb-4 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <h3 className={`font-semibold ${isRTL ? 'text-right' : 'text-left'} flex-1`}>
+                      {qIndex + 1}. {questionText}
+                    </h3>
+                    {isBmiQuestion && (
+                      <button
+                        onClick={() => setShowBmiHelper(!showBmiHelper)}
+                        className={`${isRTL ? 'mr-2' : 'ml-2'} p-2 rounded-lg ${isDarkMode ? 'bg-teal-500/20 hover:bg-teal-500/30' : 'bg-teal-100 hover:bg-teal-200'} transition-all`}
+                        title={t.bmiHelper}
+                      >
+                        <Info size={20} className="text-teal-500" />
+                      </button>
+                    )}
+                  </div>
+
+                  {isBmiQuestion && showBmiHelper && (
+                    <div className={`mb-4 p-4 rounded-lg ${isDarkMode ? 'bg-slate-800' : 'bg-white'} border-2 ${isDarkMode ? 'border-teal-500/30' : 'border-teal-200'}`}>
+                      <h4 className={`font-semibold text-teal-400 mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>{t.bmiHelper}</h4>
+                      <p className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-gray-600'} mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>{t.bmiDescription}</p>
+
+                      <div className="mb-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-semibold">
+                          <div className="flex items-center gap-2">
+                            <span className="w-4 h-4 bg-red-500 rounded"></span>
+                            <span>{t.obese}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-4 h-4 bg-yellow-500 rounded"></span>
+                            <span>{t.overweight}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-4 h-4 bg-green-500 rounded"></span>
+                            <span>{t.normalWeight}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-4 h-4 bg-orange-500 rounded"></span>
+                            <span>{t.underweight}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <div className={`text-xs ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>
+                          <div className="mb-2 font-semibold">{t.weight} / {t.height}</div>
+                          <table className="border-collapse w-full text-center">
+                            <thead>
+                              <tr>
+                                <th className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}></th>
+                                <th className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>1.50</th>
+                                <th className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>1.60</th>
+                                <th className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>1.70</th>
+                                <th className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>1.80</th>
+                                <th className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>1.90</th>
+                                <th className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>2.00</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr><td className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>50</td><td className="border p-1 bg-green-500 text-white font-bold">22</td><td className="border p-1 bg-green-500 text-white font-bold">20</td><td className="border p-1 bg-green-500 text-white font-bold">17</td><td className="border p-1 bg-orange-500 text-white font-bold">15</td><td className="border p-1 bg-orange-500 text-white font-bold">14</td><td className="border p-1 bg-orange-500 text-white font-bold">13</td></tr>
+                              <tr><td className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>60</td><td className="border p-1 bg-yellow-500 text-white font-bold">27</td><td className="border p-1 bg-green-500 text-white font-bold">23</td><td className="border p-1 bg-green-500 text-white font-bold">21</td><td className="border p-1 bg-green-500 text-white font-bold">18</td><td className="border p-1 bg-orange-500 text-white font-bold">17</td><td className="border p-1 bg-orange-500 text-white font-bold">15</td></tr>
+                              <tr><td className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>70</td><td className="border p-1 bg-yellow-500 text-white font-bold">31</td><td className="border p-1 bg-yellow-500 text-white font-bold">27</td><td className="border p-1 bg-green-500 text-white font-bold">24</td><td className="border p-1 bg-green-500 text-white font-bold">22</td><td className="border p-1 bg-green-500 text-white font-bold">19</td><td className="border p-1 bg-green-500 text-white font-bold">18</td></tr>
+                              <tr><td className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>80</td><td className="border p-1 bg-red-500 text-white font-bold">36</td><td className="border p-1 bg-yellow-500 text-white font-bold">31</td><td className="border p-1 bg-yellow-500 text-white font-bold">28</td><td className="border p-1 bg-yellow-500 text-white font-bold">25</td><td className="border p-1 bg-green-500 text-white font-bold">22</td><td className="border p-1 bg-green-500 text-white font-bold">20</td></tr>
+                              <tr><td className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>90</td><td className="border p-1 bg-red-500 text-white font-bold">40</td><td className="border p-1 bg-red-500 text-white font-bold">35</td><td className="border p-1 bg-yellow-500 text-white font-bold">31</td><td className="border p-1 bg-yellow-500 text-white font-bold">28</td><td className="border p-1 bg-yellow-500 text-white font-bold">25</td><td className="border p-1 bg-green-500 text-white font-bold">23</td></tr>
+                              <tr><td className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>100</td><td className="border p-1 bg-red-500 text-white font-bold">44</td><td className="border p-1 bg-red-500 text-white font-bold">39</td><td className="border p-1 bg-red-500 text-white font-bold">35</td><td className="border p-1 bg-yellow-500 text-white font-bold">31</td><td className="border p-1 bg-yellow-500 text-white font-bold">28</td><td className="border p-1 bg-yellow-500 text-white font-bold">25</td></tr>
+                              <tr><td className={`border ${isDarkMode ? 'border-slate-600' : 'border-gray-300'} p-1`}>110</td><td className="border p-1 bg-red-500 text-white font-bold">49</td><td className="border p-1 bg-red-500 text-white font-bold">43</td><td className="border p-1 bg-red-500 text-white font-bold">38</td><td className="border p-1 bg-red-500 text-white font-bold">34</td><td className="border p-1 bg-yellow-500 text-white font-bold">30</td><td className="border p-1 bg-yellow-500 text-white font-bold">28</td></tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="space-y-3">
                     {question.options.map((option, oIndex) => {
                       const optionLabel = language === 'ar' ? option.labelAr : language === 'fr' ? option.labelFr : option.labelEn;
@@ -202,7 +299,7 @@ const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssess
                         <button
                           key={oIndex}
                           onClick={() => handleAnswerChange(question.id, option.points)}
-                          className={`w-full p-4 rounded-lg border-2 transition-all ${isRTL ? 'text-right' : 'text-left'} ${
+                          className={`w-full p-4 rounded-lg border-2 transition-all flex items-center justify-between ${isRTL ? 'flex-row-reverse' : 'flex-row'} ${
                             isSelected
                               ? 'border-teal-500 bg-teal-500/20'
                               : isDarkMode
@@ -210,7 +307,16 @@ const RiskAssessment = ({ assessment, onBack, isDarkMode, language }: RiskAssess
                               : 'border-gray-300 hover:border-teal-500/50 bg-white'
                           }`}
                         >
-                          {optionLabel}
+                          <span className={`${isRTL ? 'text-right' : 'text-left'} flex-1`}>{optionLabel}</span>
+                          <span className={`${isRTL ? 'mr-3' : 'ml-3'} px-3 py-1 rounded-full text-xs font-bold ${
+                            isSelected
+                              ? 'bg-teal-500 text-white'
+                              : isDarkMode
+                              ? 'bg-slate-700 text-slate-400'
+                              : 'bg-gray-200 text-gray-600'
+                          }`}>
+                            {option.points} {t.points}
+                          </span>
                         </button>
                       );
                     })}
