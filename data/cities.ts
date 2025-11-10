@@ -199,9 +199,9 @@ export const LIST_OF_CITIES: City[] = [
   {
     id: 28,
     city: "SIDI-BOUOUTHMAN",
-    city_name_english: "Sidi BouoUthman",
+    city_name_english: "Sidi Bououthman",
     city_name_arabic: "سيدي بوعثمان",
-    city_name_french: "Sidi BouoUthman"
+    city_name_french: "Sidi Bououthman"
   },
   {
     id: 29,
